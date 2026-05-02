@@ -1,7 +1,15 @@
+// 🔥 FIREBASE IMPORTS
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } 
-from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { 
+  getFirestore, 
+  collection, 
+  addDoc, 
+  getDocs, 
+  deleteDoc, 
+  doc 
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
+// 🔥 CONFIG
 const firebaseConfig = {
   apiKey: "AIzaSyAZ6gOO32DstTL9LPSgtYYa3Jptq_8QNrs",
   authDomain: "quarentena-39458.firebaseapp.com",
@@ -11,31 +19,22 @@ const firebaseConfig = {
   appId: "1:200343768046:web:86905492b62c2fa7049cff"
 };
 
+// INIT
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
+// 🔥 VARIÁVEIS
 let data = [];
-let chart, chartPizza;
-
-// ELEMENTOS
-const table_body = document.getElementById("table_body");
-const addBtn = document.getElementById("addBtn");
-
-const newPrefixo = document.getElementById("newPrefixo");
-const newProtocolo = document.getElementById("newProtocolo");
-const newSetor = document.getElementById("newSetor");
-const newEngenharia = document.getElementById("newEngenharia");
-const newStatus = document.getElementById("newStatus");
-
-const count_espera = document.getElementById("count_espera");
-const count_scrap = document.getElementById("count_scrap");
-const count_entregue = document.getElementById("count_entregue");
-const count_outros = document.getElementById("count_outros");
+let chart;
+let chartPizza;
 
 // LOADER
-window.onload = ()=>{
+window.onload = () => {
   const loader = document.getElementById("loader-container");
-  setTimeout(()=> loader.style.display="none", 800);
+  setTimeout(()=>{
+    loader.classList.add("hide");
+    setTimeout(()=>loader.style.display="none",400);
+  },1000);
 };
 
 // ABAS
@@ -43,29 +42,32 @@ window.showTab = function(tab){
   document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
   document.getElementById(tab).classList.add("active");
 
-  if(tab==="dashboard"){
-    setTimeout(()=>gerarGrafico(),100);
-  }
+  if(tab==="dashboard") gerarGrafico();
 };
 
-// FIREBASE
+// 🔥 CARREGAR DO FIREBASE
 async function carregarDados(){
   const snapshot = await getDocs(collection(db,"pecas"));
-  data = snapshot.docs.map(doc=>({id:doc.id,...doc.data()}));
+
+  data = snapshot.docs.map(doc=>({
+    id: doc.id,
+    ...doc.data()
+  }));
+
   renderTable();
   updateDashboard();
 }
 
 // ADD
-addBtn.addEventListener("click", async ()=>{
+addBtn.onclick = async ()=>{
 
-  const prefixo = newPrefixo.value.toUpperCase();
-  const protocolo = newProtocolo.value.toUpperCase();
+  const prefixo=newPrefixo.value.toUpperCase();
+  const protocolo=newProtocolo.value.toUpperCase();
 
-  const r1 = /^(PR|PS|PT)-[A-Z]{3}$|^(FAB|EB)-[0-9]{4}$/;
-  const r2 = /^HBRQ-[0-9]{3}$/;
+  const r1=/^(PR|PS|PT)-[A-Z]{3}$|^(FAB|EB)-[0-9]{4}$/;
+  const r2=/^HBRQ-[0-9]{3}$/;
 
-  if(!r1.test(prefixo) || !r2.test(protocolo)){
+  if(!r1.test(prefixo)||!r2.test(protocolo)){
     alert("Formato inválido");
     return;
   }
@@ -79,16 +81,14 @@ addBtn.addEventListener("click", async ()=>{
     data:new Date().toLocaleDateString('pt-BR')
   });
 
-  newPrefixo.value="";
-  newProtocolo.value="";
-
   carregarDados();
-});
+};
 
 // TABLE
 function renderTable(){
   table_body.innerHTML="";
-  data.forEach(item=>{
+
+  data.forEach((item)=>{
     table_body.innerHTML+=`
     <tr>
       <td>${item.prefixo}</td>
@@ -97,23 +97,30 @@ function renderTable(){
       <td><span class="tag ${item.engenharia}">${item.engenharia}</span></td>
       <td><span class="tag ${item.status}">${item.status}</span></td>
       <td>${item.data}</td>
-      <td><button onclick="deleteItem('${item.id}')">X</button></td>
+      <td><button class="delete-btn" onclick="deleteItem('${item.id}')">Excluir</button></td>
     </tr>`;
   });
 }
 
 // DELETE
-window.deleteItem = async(id)=>{
+window.deleteItem = async function(id){
   await deleteDoc(doc(db,"pecas",id));
   carregarDados();
 };
 
 // DASHBOARD
 function updateDashboard(){
-  count_espera.innerText = data.filter(d=>d.engenharia==="espera").length;
-  count_scrap.innerText = data.filter(d=>d.status==="scrap").length;
-  count_entregue.innerText = data.filter(d=>d.status==="entregue").length;
-  count_outros.innerText = data.filter(d=>!["scrap","entregue"].includes(d.status)).length;
+  count_espera.innerText =
+    data.filter(d=>d.engenharia==="espera").length;
+
+  count_scrap.innerText =
+    data.filter(d=>d.status==="scrap").length;
+
+  count_entregue.innerText =
+    data.filter(d=>d.status==="entregue").length;
+
+  count_outros.innerText =
+    data.filter(d=>!["scrap","entregue"].includes(d.status)).length;
 }
 
 // GRÁFICOS
@@ -127,17 +134,23 @@ function gerarGrafico(){
     data:{
       labels:["Jan","Fev","Mar"],
       datasets:[{
+        label:"Peças",
         data:[2,4,6],
-        borderColor:"#00c853"
+        borderColor:"#00c853",
+        tension:0.3
       }]
     },
-    options:{maintainAspectRatio:false}
+    options:{
+      responsive:true,
+      maintainAspectRatio:false
+    }
   });
 
   const statusCount = {};
+
   data.forEach(d=>{
     if(d.status){
-      statusCount[d.status]=(statusCount[d.status]||0)+1;
+      statusCount[d.status] = (statusCount[d.status] || 0) + 1;
     }
   });
 
@@ -147,11 +160,17 @@ function gerarGrafico(){
       labels:Object.keys(statusCount),
       datasets:[{
         data:Object.values(statusCount),
-        backgroundColor:["green","red","orange","#007aff","#555"]
+        backgroundColor:[
+          "green","red","orange","#007aff","#555"
+        ]
       }]
     },
-    options:{maintainAspectRatio:false}
+    options:{
+      responsive:true,
+      maintainAspectRatio:false
+    }
   });
 }
 
+// INIT
 carregarDados();

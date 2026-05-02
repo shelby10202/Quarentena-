@@ -7,17 +7,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="./style.css">
+<link rel="stylesheet" href="style.css">
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
 
-<!-- LOADER -->
 <div id="loader-container">
   <div class="loader"></div>
 </div>
+
+<div id="main-content">
 
 <header>
   <h1>Controle de peças Quarentena</h1>
@@ -33,11 +34,11 @@
 <thead>
 
 <tr class="input-row">
-<td><input id="newPrefixo" placeholder="PR-ABC / FAB-1234"></td>
-<td><input id="newProtocolo" placeholder="HBRQ-001"></td>
+<td><input id="newPrefixo" class="input-custom" placeholder="PR-ABC / FAB-1234"></td>
+<td><input id="newProtocolo" class="input-custom" placeholder="HBRQ-001"></td>
 
 <td>
-<select id="newSetor">
+<select id="newSetor" class="input-custom">
 <option value="">-</option>
 <option value="civil">Civil</option>
 <option value="militar">Militar</option>
@@ -45,7 +46,7 @@
 </td>
 
 <td>
-<select id="newEngenharia">
+<select id="newEngenharia" class="input-custom">
 <option value="">-</option>
 <option value="aprovado">Sim</option>
 <option value="espera">Em espera</option>
@@ -53,7 +54,7 @@
 </td>
 
 <td>
-<select id="newStatus">
+<select id="newStatus" class="input-custom">
 <option value="">-</option>
 <option value="entregue">Entregue</option>
 <option value="scrap">Scrap</option>
@@ -94,23 +95,28 @@
 <div class="card outros"><p>Outros</p><span id="count_outros">0</span></div>
 </div>
 
+<!-- GRAFICOS -->
 <div class="graficos-container">
+
   <div class="grafico-box">
-    <h3>Evolução</h3>
+    <h3>Evolução das Peças</h3>
     <canvas id="grafico"></canvas>
   </div>
 
   <div class="grafico-box">
-    <h3>Status</h3>
+    <h3>Status das Peças</h3>
     <canvas id="graficoPizza"></canvas>
   </div>
+
 </div>
 
 </div>
 
 </section>
 
-<script type="module" src="./script.js"></script>
+</div>
+
+<script src="script.js" defer></script>
 
 </body>
 </html>
