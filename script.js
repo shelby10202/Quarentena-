@@ -1,4 +1,3 @@
-// 🔥 IMPORTS FIREBASE (MODULAR)
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { 
   getFirestore, 
@@ -9,7 +8,6 @@ import {
   doc 
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-// 🔥 SUA CONFIG (já coloquei)
 const firebaseConfig = {
   apiKey: "AIzaSyAZ6gOO32DstTL9LPSgtYYa3Jptq_8QNrs",
   authDomain: "quarentena-39458.firebaseapp.com",
@@ -19,33 +17,37 @@ const firebaseConfig = {
   appId: "1:200343768046:web:86905492b62c2fa7049cff"
 };
 
-// INIT
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// VARIÁVEIS
 let data = [];
-let chart;
-let chartPizza;
+let chart, chartPizza;
 
 // ELEMENTOS
 const table_body = document.getElementById("table_body");
 const addBtn = document.getElementById("addBtn");
 
-// INPUTS
 const newPrefixo = document.getElementById("newPrefixo");
 const newProtocolo = document.getElementById("newProtocolo");
 const newSetor = document.getElementById("newSetor");
 const newEngenharia = document.getElementById("newEngenharia");
 const newStatus = document.getElementById("newStatus");
 
-// DASHBOARD
 const count_espera = document.getElementById("count_espera");
 const count_scrap = document.getElementById("count_scrap");
 const count_entregue = document.getElementById("count_entregue");
 const count_outros = document.getElementById("count_outros");
 
-// ABAS GLOBAL
+// LOADER
+window.onload = () => {
+  const loader = document.getElementById("loader-container");
+  setTimeout(()=>{
+    loader.classList.add("hide");
+    setTimeout(()=>loader.style.display="none",400);
+  },800);
+};
+
+// ABAS
 window.showTab = function(tab){
   document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
   document.getElementById(tab).classList.add("active");
@@ -55,7 +57,7 @@ window.showTab = function(tab){
   }
 };
 
-// 🔥 CARREGAR DADOS
+// CARREGAR
 async function carregarDados(){
   const querySnapshot = await getDocs(collection(db, "pecas"));
 
@@ -68,19 +70,35 @@ async function carregarDados(){
   updateDashboard();
 }
 
-// ADD
-addBtn.onclick = async ()=>{
+// ADD COM VALIDAÇÃO
+addBtn.addEventListener("click", async ()=>{
+
+  const prefixo = newPrefixo.value.toUpperCase();
+  const protocolo = newProtocolo.value.toUpperCase();
+
+  const r1 = /^(PR|PS|PT)-[A-Z]{3}$|^(FAB|EB)-[0-9]{4}$/;
+  const r2 = /^HBRQ-[0-9]{3}$/;
+
+  if(!r1.test(prefixo) || !r2.test(protocolo)){
+    alert("Formato inválido");
+    return;
+  }
+
   await addDoc(collection(db, "pecas"), {
-    prefixo:newPrefixo.value,
-    protocolo:newProtocolo.value,
+    prefixo,
+    protocolo,
     setor:newSetor.value,
     engenharia:newEngenharia.value,
     status:newStatus.value,
     data:new Date().toLocaleDateString('pt-BR')
   });
 
+  // limpa inputs
+  newPrefixo.value="";
+  newProtocolo.value="";
+
   carregarDados();
-};
+});
 
 // TABLE
 function renderTable(){
@@ -91,9 +109,9 @@ function renderTable(){
       <tr>
         <td>${item.prefixo}</td>
         <td>${item.protocolo}</td>
-        <td>${item.setor}</td>
-        <td>${item.engenharia}</td>
-        <td>${item.status}</td>
+        <td><span class="tag ${item.setor}">${item.setor}</span></td>
+        <td><span class="tag ${item.engenharia}">${item.engenharia}</span></td>
+        <td><span class="tag ${item.status}">${item.status}</span></td>
         <td>${item.data}</td>
         <td><button onclick="deleteItem('${item.id}')">X</button></td>
       </tr>
@@ -101,7 +119,7 @@ function renderTable(){
   });
 }
 
-// DELETE GLOBAL
+// DELETE
 window.deleteItem = async function(id){
   await deleteDoc(doc(db, "pecas", id));
   carregarDados();
@@ -130,9 +148,7 @@ function gerarGrafico(){
         borderColor:"#00c853"
       }]
     },
-    options:{
-      maintainAspectRatio:false
-    }
+    options:{ maintainAspectRatio:false }
   });
 
   const statusCount = {};
@@ -151,9 +167,7 @@ function gerarGrafico(){
         backgroundColor:["green","red","orange","#007aff","#555"]
       }]
     },
-    options:{
-      maintainAspectRatio:false
-    }
+    options:{ maintainAspectRatio:false }
   });
 }
 
