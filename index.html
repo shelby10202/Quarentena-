@@ -6,15 +6,14 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="./style.css">
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
 
-<!-- 🔥 LOADER -->
+<!-- LOADER -->
 <div id="loader-container">
   <div class="loader"></div>
 </div>
@@ -33,11 +32,11 @@
 <thead>
 
 <tr class="input-row">
-<td><input id="newPrefixo" class="input-custom" placeholder="PR-ABC / FAB-1234"></td>
-<td><input id="newProtocolo" class="input-custom" placeholder="HBRQ-001"></td>
+<td><input id="newPrefixo" placeholder="PR-ABC / FAB-1234"></td>
+<td><input id="newProtocolo" placeholder="HBRQ-001"></td>
 
 <td>
-<select id="newSetor" class="input-custom">
+<select id="newSetor">
 <option value="">-</option>
 <option value="civil">Civil</option>
 <option value="militar">Militar</option>
@@ -45,7 +44,7 @@
 </td>
 
 <td>
-<select id="newEngenharia" class="input-custom">
+<select id="newEngenharia">
 <option value="">-</option>
 <option value="aprovado">Sim</option>
 <option value="espera">Em espera</option>
@@ -53,7 +52,7 @@
 </td>
 
 <td>
-<select id="newStatus" class="input-custom">
+<select id="newStatus">
 <option value="">-</option>
 <option value="entregue">Entregue</option>
 <option value="scrap">Scrap</option>
@@ -110,7 +109,7 @@
 
 </section>
 
-<script type="module" src="script.js"></script>
+<script type="module" src="./script.js"></script>
 
 </body>
 </html>
