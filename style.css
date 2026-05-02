@@ -1,29 +1,109 @@
+body{
+  font-family:Arial;
+  background:#e9ecef;
+  margin:0;
+}
+
+header{
+  background:#111;
+  color:white;
+  text-align:center;
+  padding:15px;
+}
+
+.tabs{
+  display:flex;
+  background:#222;
+}
+.tabs button{
+  flex:1;
+  padding:10px;
+  color:white;
+  background:none;
+  border:none;
+}
+
+.tab{display:none;}
+.tab.active{display:block;}
+
+table{
+  width:95%;
+  margin:20px auto;
+  background:white;
+}
+
+th,td{
+  padding:10px;
+  text-align:center;
+}
+
+.tag{
+  padding:4px 8px;
+  border-radius:6px;
+  color:white;
+}
+.civil{background:#3498db;}
+.militar{background:#2c3e50;}
+.entregue{background:green;}
+.scrap{background:red;}
+
+.dashboard-container{
+  width:95%;
+  margin:20px auto;
+}
+
+.cards{
+  display:flex;
+  gap:10px;
+}
+.card{
+  flex:1;
+  background:#333;
+  color:white;
+  padding:15px;
+}
+
+.graficos-container{
+  display:flex;
+  gap:20px;
+  margin-top:20px;
+}
+
+.grafico-box{
+  flex:1;
+  background:white;
+  padding:20px;
+}
+
+#grafico,#graficoPizza{
+  height:350px !important;
+}
+
+@media(max-width:768px){
+  .graficos-container{flex-direction:column;}
+}
+
 /* LOADER */
-#loader-container {
-  position: fixed;
-  width: 100%;
-  height: 100%;
-  background: #111;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 999;
-  transition: opacity 0.4s ease;
-}
-#loader-container.hide {
-  opacity: 0;
-  pointer-events: none;
+#loader-container{
+  position:fixed;
+  width:100%;
+  height:100%;
+  background:#111;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  z-index:999;
 }
 
-.loader {
-  width: 40px;
-  height: 40px;
-  border: 4px solid #333;
-  border-top: 4px solid #00c853;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
+.loader{
+  width:40px;
+  height:40px;
+  border:4px solid #333;
+  border-top:4px solid #00c853;
+  border-radius:50%;
+  animation:spin 1s linear infinite;
 }
 
-@keyframes spin {
-  100% { transform: rotate(360deg); }
+@keyframes spin{
+  100%{transform:rotate(360deg);}
 }
