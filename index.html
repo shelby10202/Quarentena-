@@ -34,8 +34,8 @@
 <thead>
 
 <tr class="input-row">
-<td><input id="newPrefixo" class="input-custom" placeholder="PR-ABC / FAB-1234"></td>
-<td><input id="newProtocolo" class="input-custom" placeholder="HBRQ-001"></td>
+<td><input id="newPrefixo" class="input-custom"></td>
+<td><input id="newProtocolo" class="input-custom"></td>
 
 <td>
 <select id="newSetor" class="input-custom">
@@ -85,38 +85,30 @@
 </section>
 
 <section id="dashboard" class="tab">
-
 <div class="dashboard-container">
 
 <div class="cards">
-<div class="card espera"><p>Em Espera</p><span id="count_espera">0</span></div>
-<div class="card scrap"><p>Scrap</p><span id="count_scrap">0</span></div>
-<div class="card entregue"><p>Entregue</p><span id="count_entregue">0</span></div>
-<div class="card outros"><p>Outros</p><span id="count_outros">0</span></div>
+<div class="card espera"><span id="count_espera">0</span></div>
+<div class="card scrap"><span id="count_scrap">0</span></div>
+<div class="card entregue"><span id="count_entregue">0</span></div>
+<div class="card outros"><span id="count_outros">0</span></div>
 </div>
 
-<!-- GRAFICOS -->
 <div class="graficos-container">
-
   <div class="grafico-box">
-    <h3>Evolução das Peças</h3>
     <canvas id="grafico"></canvas>
   </div>
-
   <div class="grafico-box">
-    <h3>Status das Peças</h3>
     <canvas id="graficoPizza"></canvas>
   </div>
-
 </div>
 
 </div>
-
 </section>
 
 </div>
 
-<script src="script.js" defer></script>
+<script type="module" src="script.js"></script>
 
 </body>
 </html>
