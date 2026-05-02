@@ -1,12 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { 
-  getFirestore, 
-  collection, 
-  addDoc, 
-  getDocs, 
-  deleteDoc, 
-  doc 
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } 
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAZ6gOO32DstTL9LPSgtYYa3Jptq_8QNrs",
@@ -23,7 +17,6 @@ const db = getFirestore(app);
 let data = [];
 let chart, chartPizza;
 
-// ELEMENTOS
 const table_body = document.getElementById("table_body");
 const addBtn = document.getElementById("addBtn");
 
@@ -39,11 +32,10 @@ const count_entregue = document.getElementById("count_entregue");
 const count_outros = document.getElementById("count_outros");
 
 // LOADER
-window.onload = () => {
+window.onload = ()=>{
   const loader = document.getElementById("loader-container");
   setTimeout(()=>{
-    loader.classList.add("hide");
-    setTimeout(()=>loader.style.display="none",400);
+    loader.style.display="none";
   },800);
 };
 
@@ -57,20 +49,15 @@ window.showTab = function(tab){
   }
 };
 
-// CARREGAR
+// FIREBASE
 async function carregarDados(){
-  const querySnapshot = await getDocs(collection(db, "pecas"));
-
-  data = querySnapshot.docs.map(doc => ({
-    id: doc.id,
-    ...doc.data()
-  }));
-
+  const snapshot = await getDocs(collection(db,"pecas"));
+  data = snapshot.docs.map(doc=>({id:doc.id,...doc.data()}));
   renderTable();
   updateDashboard();
 }
 
-// ADD COM VALIDAÇÃO
+// ADD
 addBtn.addEventListener("click", async ()=>{
 
   const prefixo = newPrefixo.value.toUpperCase();
@@ -84,7 +71,7 @@ addBtn.addEventListener("click", async ()=>{
     return;
   }
 
-  await addDoc(collection(db, "pecas"), {
+  await addDoc(collection(db,"pecas"),{
     prefixo,
     protocolo,
     setor:newSetor.value,
@@ -93,7 +80,6 @@ addBtn.addEventListener("click", async ()=>{
     data:new Date().toLocaleDateString('pt-BR')
   });
 
-  // limpa inputs
   newPrefixo.value="";
   newProtocolo.value="";
 
@@ -103,25 +89,23 @@ addBtn.addEventListener("click", async ()=>{
 // TABLE
 function renderTable(){
   table_body.innerHTML="";
-
   data.forEach(item=>{
     table_body.innerHTML+=`
-      <tr>
-        <td>${item.prefixo}</td>
-        <td>${item.protocolo}</td>
-        <td><span class="tag ${item.setor}">${item.setor}</span></td>
-        <td><span class="tag ${item.engenharia}">${item.engenharia}</span></td>
-        <td><span class="tag ${item.status}">${item.status}</span></td>
-        <td>${item.data}</td>
-        <td><button onclick="deleteItem('${item.id}')">X</button></td>
-      </tr>
-    `;
+    <tr>
+      <td>${item.prefixo}</td>
+      <td>${item.protocolo}</td>
+      <td><span class="tag ${item.setor}">${item.setor}</span></td>
+      <td><span class="tag ${item.engenharia}">${item.engenharia}</span></td>
+      <td><span class="tag ${item.status}">${item.status}</span></td>
+      <td>${item.data}</td>
+      <td><button onclick="deleteItem('${item.id}')">X</button></td>
+    </tr>`;
   });
 }
 
 // DELETE
-window.deleteItem = async function(id){
-  await deleteDoc(doc(db, "pecas", id));
+window.deleteItem = async(id)=>{
+  await deleteDoc(doc(db,"pecas",id));
   carregarDados();
 };
 
@@ -133,22 +117,19 @@ function updateDashboard(){
   count_outros.innerText = data.filter(d=>!["scrap","entregue"].includes(d.status)).length;
 }
 
-// GRÁFICOS
+// GRAFICOS
 function gerarGrafico(){
 
   if(chart) chart.destroy();
   if(chartPizza) chartPizza.destroy();
 
-  chart = new Chart(document.getElementById("grafico"),{
+  chart = new Chart(grafico,{
     type:"line",
     data:{
       labels:["Jan","Fev","Mar"],
-      datasets:[{
-        data:[2,4,6],
-        borderColor:"#00c853"
-      }]
+      datasets:[{data:[2,4,6]}]
     },
-    options:{ maintainAspectRatio:false }
+    options:{maintainAspectRatio:false}
   });
 
   const statusCount = {};
@@ -158,16 +139,13 @@ function gerarGrafico(){
     }
   });
 
-  chartPizza = new Chart(document.getElementById("graficoPizza"),{
+  chartPizza = new Chart(graficoPizza,{
     type:"pie",
     data:{
       labels:Object.keys(statusCount),
-      datasets:[{
-        data:Object.values(statusCount),
-        backgroundColor:["green","red","orange","#007aff","#555"]
-      }]
+      datasets:[{data:Object.values(statusCount)}]
     },
-    options:{ maintainAspectRatio:false }
+    options:{maintainAspectRatio:false}
   });
 }
 
