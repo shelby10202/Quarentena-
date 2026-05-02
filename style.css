@@ -1,14 +1,14 @@
 body{
-  font-family:Arial;
-  background:#e9ecef;
+  font-family:'Inter',sans-serif;
   margin:0;
+  background:linear-gradient(135deg,#f1f3f5,#e9ecef);
 }
 
 header{
   background:#111;
   color:white;
-  text-align:center;
   padding:15px;
+  text-align:center;
 }
 
 .tabs{
@@ -28,13 +28,37 @@ header{
 
 table{
   width:95%;
-  margin:20px auto;
+  margin:25px auto;
   background:white;
+  border-radius:12px;
+  overflow:hidden;
+  box-shadow:0 4px 12px rgba(0,0,0,0.08);
 }
 
-th,td{
+th{
+  background:#111;
+  color:white;
+}
+
+td{
+  border-bottom:1px solid #eee;
   padding:10px;
   text-align:center;
+}
+
+input,select{
+  width:100%;
+  padding:6px;
+  border-radius:6px;
+  border:1px solid #ccc;
+}
+
+button{
+  background:#00c853;
+  color:white;
+  border:none;
+  padding:8px;
+  border-radius:6px;
 }
 
 .tag{
@@ -42,6 +66,7 @@ th,td{
   border-radius:6px;
   color:white;
 }
+
 .civil{background:#3498db;}
 .militar{background:#2c3e50;}
 .entregue{background:green;}
@@ -58,10 +83,16 @@ th,td{
 }
 .card{
   flex:1;
-  background:#333;
+  padding:20px;
+  border-radius:12px;
   color:white;
-  padding:15px;
+  text-align:center;
 }
+
+.espera{background:orange;}
+.scrap{background:red;}
+.entregue{background:green;}
+.outros{background:#007aff;}
 
 .graficos-container{
   display:flex;
@@ -73,10 +104,11 @@ th,td{
   flex:1;
   background:white;
   padding:20px;
+  border-radius:12px;
 }
 
 #grafico,#graficoPizza{
-  height:350px !important;
+  height:300px !important;
 }
 
 @media(max-width:768px){

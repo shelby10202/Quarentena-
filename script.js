@@ -17,6 +17,7 @@ const db = getFirestore(app);
 let data = [];
 let chart, chartPizza;
 
+// ELEMENTOS
 const table_body = document.getElementById("table_body");
 const addBtn = document.getElementById("addBtn");
 
@@ -34,9 +35,7 @@ const count_outros = document.getElementById("count_outros");
 // LOADER
 window.onload = ()=>{
   const loader = document.getElementById("loader-container");
-  setTimeout(()=>{
-    loader.style.display="none";
-  },800);
+  setTimeout(()=> loader.style.display="none", 800);
 };
 
 // ABAS
@@ -117,7 +116,7 @@ function updateDashboard(){
   count_outros.innerText = data.filter(d=>!["scrap","entregue"].includes(d.status)).length;
 }
 
-// GRAFICOS
+// GRÁFICOS
 function gerarGrafico(){
 
   if(chart) chart.destroy();
@@ -127,7 +126,10 @@ function gerarGrafico(){
     type:"line",
     data:{
       labels:["Jan","Fev","Mar"],
-      datasets:[{data:[2,4,6]}]
+      datasets:[{
+        data:[2,4,6],
+        borderColor:"#00c853"
+      }]
     },
     options:{maintainAspectRatio:false}
   });
@@ -143,11 +145,13 @@ function gerarGrafico(){
     type:"pie",
     data:{
       labels:Object.keys(statusCount),
-      datasets:[{data:Object.values(statusCount)}]
+      datasets:[{
+        data:Object.values(statusCount),
+        backgroundColor:["green","red","orange","#007aff","#555"]
+      }]
     },
     options:{maintainAspectRatio:false}
   });
 }
 
-// INIT
 carregarDados();
