@@ -1,8 +1,15 @@
-// FIREBASE
+// 🔥 FIREBASE IMPORTS
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } 
-from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { 
+  getFirestore, 
+  collection, 
+  addDoc, 
+  getDocs, 
+  deleteDoc, 
+  doc 
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
+// 🔥 CONFIG
 const firebaseConfig = {
   apiKey: "AIzaSyAZ6gOO32DstTL9LPSgtYYa3Jptq_8QNrs",
   authDomain: "quarentena-39458.firebaseapp.com",
@@ -12,14 +19,16 @@ const firebaseConfig = {
   appId: "1:200343768046:web:86905492b62c2fa7049cff"
 };
 
+// INIT
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
+// 🔥 VARIÁVEIS
 let data = [];
 let chart;
 let chartPizza;
 
-/* LOADER */
+// LOADER
 window.onload = () => {
   const loader = document.getElementById("loader-container");
   setTimeout(()=>{
@@ -28,24 +37,30 @@ window.onload = () => {
   },1000);
 };
 
-/* ABAS */
+// ABAS
 window.showTab = function(tab){
   document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
   document.getElementById(tab).classList.add("active");
 
   if(tab==="dashboard") gerarGrafico();
-}
+};
 
-/* FIREBASE LOAD */
+// 🔥 CARREGAR DO FIREBASE
 async function carregarDados(){
   const snapshot = await getDocs(collection(db,"pecas"));
-  data = snapshot.docs.map(doc=>({id:doc.id,...doc.data()}));
+
+  data = snapshot.docs.map(doc=>({
+    id: doc.id,
+    ...doc.data()
+  }));
+
   renderTable();
   updateDashboard();
 }
 
-/* ADD */
+// ADD
 addBtn.onclick = async ()=>{
+
   const prefixo=newPrefixo.value.toUpperCase();
   const protocolo=newProtocolo.value.toUpperCase();
 
@@ -69,9 +84,10 @@ addBtn.onclick = async ()=>{
   carregarDados();
 };
 
-/* TABLE */
+// TABLE
 function renderTable(){
   table_body.innerHTML="";
+
   data.forEach((item)=>{
     table_body.innerHTML+=`
     <tr>
@@ -86,21 +102,28 @@ function renderTable(){
   });
 }
 
-/* DELETE */
+// DELETE
 window.deleteItem = async function(id){
   await deleteDoc(doc(db,"pecas",id));
   carregarDados();
-}
+};
 
-/* DASHBOARD */
+// DASHBOARD
 function updateDashboard(){
-  count_espera.innerText = data.filter(d=>d.engenharia==="espera").length;
-  count_scrap.innerText = data.filter(d=>d.status==="scrap").length;
-  count_entregue.innerText = data.filter(d=>d.status==="entregue").length;
-  count_outros.innerText = data.filter(d=>!["scrap","entregue"].includes(d.status)).length;
+  count_espera.innerText =
+    data.filter(d=>d.engenharia==="espera").length;
+
+  count_scrap.innerText =
+    data.filter(d=>d.status==="scrap").length;
+
+  count_entregue.innerText =
+    data.filter(d=>d.status==="entregue").length;
+
+  count_outros.innerText =
+    data.filter(d=>!["scrap","entregue"].includes(d.status)).length;
 }
 
-/* GRÁFICOS */
+// GRÁFICOS
 function gerarGrafico(){
 
   if(chart) chart.destroy();
@@ -117,10 +140,14 @@ function gerarGrafico(){
         tension:0.3
       }]
     },
-    options:{ responsive:true, maintainAspectRatio:false }
+    options:{
+      responsive:true,
+      maintainAspectRatio:false
+    }
   });
 
   const statusCount = {};
+
   data.forEach(d=>{
     if(d.status){
       statusCount[d.status] = (statusCount[d.status] || 0) + 1;
@@ -133,12 +160,17 @@ function gerarGrafico(){
       labels:Object.keys(statusCount),
       datasets:[{
         data:Object.values(statusCount),
-        backgroundColor:["green","red","orange","#007aff","#555"]
+        backgroundColor:[
+          "green","red","orange","#007aff","#555"
+        ]
       }]
     },
-    options:{ responsive:true, maintainAspectRatio:false }
+    options:{
+      responsive:true,
+      maintainAspectRatio:false
+    }
   });
 }
 
-/* INIT */
+// INIT
 carregarDados();
