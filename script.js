@@ -1,4 +1,4 @@
-// 🔥 FIREBASE
+// FIREBASE
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } 
 from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
@@ -15,7 +15,6 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// 🔥 MANTIDO (sem localStorage)
 let data = [];
 let chart;
 let chartPizza;
@@ -37,15 +36,10 @@ window.showTab = function(tab){
   if(tab==="dashboard") gerarGrafico();
 }
 
-/* 🔥 CARREGAR FIREBASE */
+/* FIREBASE LOAD */
 async function carregarDados(){
   const snapshot = await getDocs(collection(db,"pecas"));
-
-  data = snapshot.docs.map(doc=>({
-    id: doc.id,
-    ...doc.data()
-  }));
-
+  data = snapshot.docs.map(doc=>({id:doc.id,...doc.data()}));
   renderTable();
   updateDashboard();
 }
@@ -78,7 +72,6 @@ addBtn.onclick = async ()=>{
 /* TABLE */
 function renderTable(){
   table_body.innerHTML="";
-
   data.forEach((item)=>{
     table_body.innerHTML+=`
     <tr>
@@ -101,17 +94,10 @@ window.deleteItem = async function(id){
 
 /* DASHBOARD */
 function updateDashboard(){
-  count_espera.innerText =
-    data.filter(d=>d.engenharia==="espera").length;
-
-  count_scrap.innerText =
-    data.filter(d=>d.status==="scrap").length;
-
-  count_entregue.innerText =
-    data.filter(d=>d.status==="entregue").length;
-
-  count_outros.innerText =
-    data.filter(d=>!["scrap","entregue"].includes(d.status)).length;
+  count_espera.innerText = data.filter(d=>d.engenharia==="espera").length;
+  count_scrap.innerText = data.filter(d=>d.status==="scrap").length;
+  count_entregue.innerText = data.filter(d=>d.status==="entregue").length;
+  count_outros.innerText = data.filter(d=>!["scrap","entregue"].includes(d.status)).length;
 }
 
 /* GRÁFICOS */
@@ -131,14 +117,10 @@ function gerarGrafico(){
         tension:0.3
       }]
     },
-    options:{
-      responsive:true,
-      maintainAspectRatio:false
-    }
+    options:{ responsive:true, maintainAspectRatio:false }
   });
 
   const statusCount = {};
-
   data.forEach(d=>{
     if(d.status){
       statusCount[d.status] = (statusCount[d.status] || 0) + 1;
@@ -151,19 +133,10 @@ function gerarGrafico(){
       labels:Object.keys(statusCount),
       datasets:[{
         data:Object.values(statusCount),
-        backgroundColor:[
-          "green",
-          "red",
-          "orange",
-          "#007aff",
-          "#555"
-        ]
+        backgroundColor:["green","red","orange","#007aff","#555"]
       }]
     },
-    options:{
-      responsive:true,
-      maintainAspectRatio:false
-    }
+    options:{ responsive:true, maintainAspectRatio:false }
   });
 }
 
