@@ -1,3 +1,4 @@
+// 🔥 FIREBASE
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } 
 from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
@@ -14,49 +15,43 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// 🔥 ELEMENTOS (CORRIGIDO)
-const addBtn = document.getElementById("addBtn");
-const newPrefixo = document.getElementById("newPrefixo");
-const newProtocolo = document.getElementById("newProtocolo");
-const newSetor = document.getElementById("newSetor");
-const newEngenharia = document.getElementById("newEngenharia");
-const newStatus = document.getElementById("newStatus");
-
-const table_body = document.getElementById("table_body");
-
-const count_espera = document.getElementById("count_espera");
-const count_scrap = document.getElementById("count_scrap");
-const count_entregue = document.getElementById("count_entregue");
-const count_outros = document.getElementById("count_outros");
-
+// 🔥 MANTIDO (sem localStorage)
 let data = [];
-let chart, chartPizza;
+let chart;
+let chartPizza;
 
-// LOADER
-window.onload = ()=>{
+/* LOADER */
+window.onload = () => {
   const loader = document.getElementById("loader-container");
-  setTimeout(()=> loader.style.display="none",1000);
+  setTimeout(()=>{
+    loader.classList.add("hide");
+    setTimeout(()=>loader.style.display="none",400);
+  },1000);
 };
 
-// ABAS
+/* ABAS */
 window.showTab = function(tab){
   document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
   document.getElementById(tab).classList.add("active");
 
   if(tab==="dashboard") gerarGrafico();
-};
+}
 
-// FIREBASE
+/* 🔥 CARREGAR FIREBASE */
 async function carregarDados(){
   const snapshot = await getDocs(collection(db,"pecas"));
-  data = snapshot.docs.map(doc=>({id:doc.id,...doc.data()}));
+
+  data = snapshot.docs.map(doc=>({
+    id: doc.id,
+    ...doc.data()
+  }));
+
   renderTable();
   updateDashboard();
 }
 
-// ADD
-addBtn.addEventListener("click", async ()=>{
-
+/* ADD */
+addBtn.onclick = async ()=>{
   const prefixo=newPrefixo.value.toUpperCase();
   const protocolo=newProtocolo.value.toUpperCase();
 
@@ -78,12 +73,13 @@ addBtn.addEventListener("click", async ()=>{
   });
 
   carregarDados();
-});
+};
 
-// TABLE
+/* TABLE */
 function renderTable(){
   table_body.innerHTML="";
-  data.forEach(item=>{
+
+  data.forEach((item)=>{
     table_body.innerHTML+=`
     <tr>
       <td>${item.prefixo}</td>
@@ -92,26 +88,33 @@ function renderTable(){
       <td><span class="tag ${item.engenharia}">${item.engenharia}</span></td>
       <td><span class="tag ${item.status}">${item.status}</span></td>
       <td>${item.data}</td>
-      <td><button onclick="deleteItem('${item.id}')">X</button></td>
+      <td><button class="delete-btn" onclick="deleteItem('${item.id}')">Excluir</button></td>
     </tr>`;
   });
 }
 
-// DELETE
-window.deleteItem = async(id)=>{
+/* DELETE */
+window.deleteItem = async function(id){
   await deleteDoc(doc(db,"pecas",id));
   carregarDados();
-};
-
-// DASHBOARD
-function updateDashboard(){
-  count_espera.innerText = data.filter(d=>d.engenharia==="espera").length;
-  count_scrap.innerText = data.filter(d=>d.status==="scrap").length;
-  count_entregue.innerText = data.filter(d=>d.status==="entregue").length;
-  count_outros.innerText = data.filter(d=>!["scrap","entregue"].includes(d.status)).length;
 }
 
-// GRÁFICOS
+/* DASHBOARD */
+function updateDashboard(){
+  count_espera.innerText =
+    data.filter(d=>d.engenharia==="espera").length;
+
+  count_scrap.innerText =
+    data.filter(d=>d.status==="scrap").length;
+
+  count_entregue.innerText =
+    data.filter(d=>d.status==="entregue").length;
+
+  count_outros.innerText =
+    data.filter(d=>!["scrap","entregue"].includes(d.status)).length;
+}
+
+/* GRÁFICOS */
 function gerarGrafico(){
 
   if(chart) chart.destroy();
@@ -122,17 +125,23 @@ function gerarGrafico(){
     data:{
       labels:["Jan","Fev","Mar"],
       datasets:[{
+        label:"Peças",
         data:[2,4,6],
-        borderColor:"#00c853"
+        borderColor:"#00c853",
+        tension:0.3
       }]
     },
-    options:{maintainAspectRatio:false}
+    options:{
+      responsive:true,
+      maintainAspectRatio:false
+    }
   });
 
   const statusCount = {};
+
   data.forEach(d=>{
     if(d.status){
-      statusCount[d.status]=(statusCount[d.status]||0)+1;
+      statusCount[d.status] = (statusCount[d.status] || 0) + 1;
     }
   });
 
@@ -142,12 +151,21 @@ function gerarGrafico(){
       labels:Object.keys(statusCount),
       datasets:[{
         data:Object.values(statusCount),
-        backgroundColor:["green","red","orange","#007aff","#555"]
+        backgroundColor:[
+          "green",
+          "red",
+          "orange",
+          "#007aff",
+          "#555"
+        ]
       }]
     },
-    options:{maintainAspectRatio:false}
+    options:{
+      responsive:true,
+      maintainAspectRatio:false
+    }
   });
 }
 
-// INIT
+/* INIT */
 carregarDados();
