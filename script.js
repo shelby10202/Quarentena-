@@ -1,4 +1,4 @@
-// 🔥 FIREBASE IMPORTS
+// 🔥 IMPORTS FIREBASE (MODULAR)
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { 
   getFirestore, 
@@ -9,7 +9,7 @@ import {
   doc 
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-// 🔥 CONFIG
+// 🔥 SUA CONFIG (já coloquei)
 const firebaseConfig = {
   apiKey: "AIzaSyAZ6gOO32DstTL9LPSgtYYa3Jptq_8QNrs",
   authDomain: "quarentena-39458.firebaseapp.com",
@@ -23,33 +23,43 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// 🔥 VARIÁVEIS
+// VARIÁVEIS
 let data = [];
 let chart;
 let chartPizza;
 
-// LOADER
-window.onload = () => {
-  const loader = document.getElementById("loader-container");
-  setTimeout(()=>{
-    loader.classList.add("hide");
-    setTimeout(()=>loader.style.display="none",400);
-  },1000);
-};
+// ELEMENTOS
+const table_body = document.getElementById("table_body");
+const addBtn = document.getElementById("addBtn");
 
-// ABAS
+// INPUTS
+const newPrefixo = document.getElementById("newPrefixo");
+const newProtocolo = document.getElementById("newProtocolo");
+const newSetor = document.getElementById("newSetor");
+const newEngenharia = document.getElementById("newEngenharia");
+const newStatus = document.getElementById("newStatus");
+
+// DASHBOARD
+const count_espera = document.getElementById("count_espera");
+const count_scrap = document.getElementById("count_scrap");
+const count_entregue = document.getElementById("count_entregue");
+const count_outros = document.getElementById("count_outros");
+
+// ABAS GLOBAL
 window.showTab = function(tab){
   document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
   document.getElementById(tab).classList.add("active");
 
-  if(tab==="dashboard") gerarGrafico();
+  if(tab==="dashboard"){
+    setTimeout(()=>gerarGrafico(),100);
+  }
 };
 
-// 🔥 CARREGAR DO FIREBASE
+// 🔥 CARREGAR DADOS
 async function carregarDados(){
-  const snapshot = await getDocs(collection(db,"pecas"));
+  const querySnapshot = await getDocs(collection(db, "pecas"));
 
-  data = snapshot.docs.map(doc=>({
+  data = querySnapshot.docs.map(doc => ({
     id: doc.id,
     ...doc.data()
   }));
@@ -60,21 +70,9 @@ async function carregarDados(){
 
 // ADD
 addBtn.onclick = async ()=>{
-
-  const prefixo=newPrefixo.value.toUpperCase();
-  const protocolo=newProtocolo.value.toUpperCase();
-
-  const r1=/^(PR|PS|PT)-[A-Z]{3}$|^(FAB|EB)-[0-9]{4}$/;
-  const r2=/^HBRQ-[0-9]{3}$/;
-
-  if(!r1.test(prefixo)||!r2.test(protocolo)){
-    alert("Formato inválido");
-    return;
-  }
-
-  await addDoc(collection(db,"pecas"),{
-    prefixo,
-    protocolo,
+  await addDoc(collection(db, "pecas"), {
+    prefixo:newPrefixo.value,
+    protocolo:newProtocolo.value,
     setor:newSetor.value,
     engenharia:newEngenharia.value,
     status:newStatus.value,
@@ -88,39 +86,33 @@ addBtn.onclick = async ()=>{
 function renderTable(){
   table_body.innerHTML="";
 
-  data.forEach((item)=>{
+  data.forEach(item=>{
     table_body.innerHTML+=`
-    <tr>
-      <td>${item.prefixo}</td>
-      <td>${item.protocolo}</td>
-      <td><span class="tag ${item.setor}">${item.setor}</span></td>
-      <td><span class="tag ${item.engenharia}">${item.engenharia}</span></td>
-      <td><span class="tag ${item.status}">${item.status}</span></td>
-      <td>${item.data}</td>
-      <td><button class="delete-btn" onclick="deleteItem('${item.id}')">Excluir</button></td>
-    </tr>`;
+      <tr>
+        <td>${item.prefixo}</td>
+        <td>${item.protocolo}</td>
+        <td>${item.setor}</td>
+        <td>${item.engenharia}</td>
+        <td>${item.status}</td>
+        <td>${item.data}</td>
+        <td><button onclick="deleteItem('${item.id}')">X</button></td>
+      </tr>
+    `;
   });
 }
 
-// DELETE
+// DELETE GLOBAL
 window.deleteItem = async function(id){
-  await deleteDoc(doc(db,"pecas",id));
+  await deleteDoc(doc(db, "pecas", id));
   carregarDados();
 };
 
 // DASHBOARD
 function updateDashboard(){
-  count_espera.innerText =
-    data.filter(d=>d.engenharia==="espera").length;
-
-  count_scrap.innerText =
-    data.filter(d=>d.status==="scrap").length;
-
-  count_entregue.innerText =
-    data.filter(d=>d.status==="entregue").length;
-
-  count_outros.innerText =
-    data.filter(d=>!["scrap","entregue"].includes(d.status)).length;
+  count_espera.innerText = data.filter(d=>d.engenharia==="espera").length;
+  count_scrap.innerText = data.filter(d=>d.status==="scrap").length;
+  count_entregue.innerText = data.filter(d=>d.status==="entregue").length;
+  count_outros.innerText = data.filter(d=>!["scrap","entregue"].includes(d.status)).length;
 }
 
 // GRÁFICOS
@@ -129,44 +121,37 @@ function gerarGrafico(){
   if(chart) chart.destroy();
   if(chartPizza) chartPizza.destroy();
 
-  chart = new Chart(grafico,{
+  chart = new Chart(document.getElementById("grafico"),{
     type:"line",
     data:{
       labels:["Jan","Fev","Mar"],
       datasets:[{
-        label:"Peças",
         data:[2,4,6],
-        borderColor:"#00c853",
-        tension:0.3
+        borderColor:"#00c853"
       }]
     },
     options:{
-      responsive:true,
       maintainAspectRatio:false
     }
   });
 
   const statusCount = {};
-
   data.forEach(d=>{
     if(d.status){
-      statusCount[d.status] = (statusCount[d.status] || 0) + 1;
+      statusCount[d.status]=(statusCount[d.status]||0)+1;
     }
   });
 
-  chartPizza = new Chart(graficoPizza,{
+  chartPizza = new Chart(document.getElementById("graficoPizza"),{
     type:"pie",
     data:{
       labels:Object.keys(statusCount),
       datasets:[{
         data:Object.values(statusCount),
-        backgroundColor:[
-          "green","red","orange","#007aff","#555"
-        ]
+        backgroundColor:["green","red","orange","#007aff","#555"]
       }]
     },
     options:{
-      responsive:true,
       maintainAspectRatio:false
     }
   });
