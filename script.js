@@ -20,12 +20,12 @@ import {
 
 // 🔥 CONFIG FIREBASE
 const firebaseConfig = {
-  apiKey: "SUA_KEY",
-  authDomain: "SEU_DOMINIO",
-  projectId: "SEU_PROJECT_ID",
-  storageBucket: "SEU_BUCKET",
-  messagingSenderId: "SEU_ID",
-  appId: "SEU_APP_ID"
+  apiKey: "AIzaSyAZ6gOO32DstTL9LPSgtYYa3Jptq_8QNrs",
+  authDomain: "quarentena-39458.firebaseapp.com",
+  projectId: "quarentena-39458",
+  storageBucket: "quarentena-39458.firebasestorage.app",
+  messagingSenderId: "200343768046",
+  appId: "1:200343768046:web:86905492b62c2fa7049cff"
 };
 
 // INIT
