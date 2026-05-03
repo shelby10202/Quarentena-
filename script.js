@@ -1,5 +1,6 @@
 // 🔥 IMPORTS FIREBASE (MODULAR)
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+
 import { 
   getFirestore, 
   collection, 
@@ -8,7 +9,14 @@ import {
   deleteDoc, 
   doc,
   updateDoc
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+import { 
+  getAuth, 
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 // 🔥 CONFIG FIREBASE
 const firebaseConfig = {
@@ -23,6 +31,46 @@ const firebaseConfig = {
 // INIT
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const auth = getAuth(app);
+const form = document.getElementById("loginForm");
+const signupBtn = document.getElementById("signupBtn");
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const email = document.getElementById("loginEmail").value;
+  const senha = document.getElementById("loginSenha").value;
+
+  try {
+    await signInWithEmailAndPassword(auth, email, senha);
+    console.log("Logado com sucesso");
+  } catch (err) {
+    console.error(err);
+    alert("Erro no login");
+  }
+});
+signupBtn.onclick = async () => {
+
+  const email = document.getElementById("loginEmail").value;
+  const senha = document.getElementById("loginSenha").value;
+
+  try {
+    await createUserWithEmailAndPassword(auth, email, senha);
+    alert("Usuário criado!");
+  } catch (err) {
+    console.error(err);
+    alert("Erro ao criar usuário");
+  }
+};
+onAuthStateChanged(auth, (user) => {
+
+  if (user) {
+    document.getElementById("login-screen").style.display = "none";
+    carregarDados(); // sua função já existente
+  } else {
+    document.getElementById("login-screen").style.display = "flex";
+  }
+
+});
 
 // VARIÁVEIS
 let data = [];
