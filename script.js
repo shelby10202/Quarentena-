@@ -15,27 +15,29 @@ import {
   getAuth, 
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
-  onAuthStateChanged,
-  signOut
+  onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 // 🔥 CONFIG FIREBASE
 const firebaseConfig = {
-  apiKey: "AIzaSyAZ6gOO32DstTL9LPSgtYYa3Jptq_8QNrs",
-  authDomain: "quarentena-39458.firebaseapp.com",
-  projectId: "quarentena-39458",
-  storageBucket: "quarentena-39458.firebasestorage.app",
-  messagingSenderId: "200343768046",
-  appId: "1:200343768046:web:86905492b62c2fa7049cff"
+  apiKey: "SUA_KEY",
+  authDomain: "SEU_DOMINIO",
+  projectId: "SEU_PROJECT_ID",
+  storageBucket: "SEU_BUCKET",
+  messagingSenderId: "SEU_ID",
+  appId: "SEU_APP_ID"
 };
 
 // INIT
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
-signOut(auth);
+
+// ELEMENTOS LOGIN
 const form = document.getElementById("loginForm");
 const signupBtn = document.getElementById("signupBtn");
+
+// LOGIN
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -48,8 +50,9 @@ form.addEventListener("submit", async (e) => {
     alert("Email ou senha inválidos");
   }
 });
-signupBtn.onclick = async () => {
 
+// CRIAR USUÁRIO
+signupBtn.onclick = async () => {
   const email = document.getElementById("loginEmail").value;
   const senha = document.getElementById("loginSenha").value;
 
@@ -61,6 +64,8 @@ signupBtn.onclick = async () => {
     alert("Erro ao criar usuário");
   }
 };
+
+// 🔄 CONTROLE DE LOGIN + LOADER
 onAuthStateChanged(auth, async (user) => {
 
   const login = document.getElementById("login-screen");
@@ -68,45 +73,44 @@ onAuthStateChanged(auth, async (user) => {
 
   if (user) {
 
-    // 🔽 fade out login
-    login.classList.add("hidden");
+    login.classList.add("fade-out");
 
     setTimeout(async () => {
 
       login.style.display = "none";
 
-      // 🔼 fade in loader
       loader.style.display = "flex";
-      loader.classList.remove("hidden");
 
       const inicio = Date.now();
 
       await carregarDados();
 
       const tempo = Date.now() - inicio;
-      const minimo = 2000;
+      const minimo = 1500;
 
       if (tempo < minimo) {
         await new Promise(r => setTimeout(r, minimo - tempo));
       }
 
-      // 🔽 fade out loader
-      loader.classList.add("hidden");
+      loader.classList.add("fade-out");
 
       setTimeout(() => {
         loader.style.display = "none";
       }, 400);
 
-    }, 400);
+    }, 300);
 
   } else {
     login.style.display = "flex";
-    login.classList.remove("hidden");
     loader.style.display = "none";
   }
 
 });
-// VARIÁVEIS
+
+// ==============================
+// 🔥 APP PRINCIPAL
+// ==============================
+
 let data = [];
 let chart;
 let chartPizza;
@@ -128,7 +132,7 @@ const count_scrap = document.getElementById("count_scrap");
 const count_entregue = document.getElementById("count_entregue");
 const count_outros = document.getElementById("count_outros");
 
-// REGEX (UMA VEZ SÓ)
+// REGEX
 const regexPrefixo = /^(PR|PS|PT)-[A-Z]{3}$|^(EB|FAB)-\d{4}$/;
 const regexProtocolo = /^HBRQ-\d{3}$/;
 
@@ -203,7 +207,7 @@ window.editarItem = async function(id){
     status: novoStatus
   });
 
-  showAlert("Sucesso", "Aeronave atualizada");
+  showAlert("Sucesso", "Atualizado!");
   carregarDados();
 };
 
@@ -220,13 +224,13 @@ function renderTable(){
   data.forEach(item=>{
     table_body.innerHTML+=`
       <tr>
-        <td>${item.prefixo}</td>
-        <td>${item.protocolo}</td>
-        <td>${item.setor}</td>
-        <td>${item.engenharia}</td>
-        <td>${item.status}</td>
-        <td>${item.data}</td>
-        <td>
+        <td data-label="Prefixo">${item.prefixo}</td>
+        <td data-label="Protocolo">${item.protocolo}</td>
+        <td data-label="Setor">${item.setor}</td>
+        <td data-label="Engenharia">${item.engenharia}</td>
+        <td data-label="Status">${item.status}</td>
+        <td data-label="Data">${item.data}</td>
+        <td data-label="Ações">
           <button onclick="editarItem('${item.id}')">✏️</button>
           <button onclick="deleteItem('${item.id}')">🗑️</button>
         </td>
@@ -254,8 +258,7 @@ function gerarGrafico(){
     data:{
       labels:["Jan","Fev","Mar"],
       datasets:[{
-        data:[2,4,6],
-        borderColor:"#00c853"
+        data:[2,4,6]
       }]
     },
     options:{ maintainAspectRatio:false }
@@ -273,15 +276,14 @@ function gerarGrafico(){
     data:{
       labels:Object.keys(statusCount),
       datasets:[{
-        data:Object.values(statusCount),
-        backgroundColor:["green","red","orange","#007aff","#555"]
+        data:Object.values(statusCount)
       }]
     },
     options:{ maintainAspectRatio:false }
   });
 }
 
-// LOADER + ABAS
+// ABAS
 window.showTab = function(tab){
 
   document.querySelectorAll(".tab")
@@ -295,7 +297,7 @@ window.showTab = function(tab){
   }
 };
 
-// VALIDAÇÃO BOTÃO
+// VALIDAÇÃO
 function validarCampos(){
   addBtn.disabled = !(
     newPrefixo.value.trim() &&
@@ -318,7 +320,7 @@ newProtocolo.addEventListener("input", () => {
   newProtocolo.value = newProtocolo.value.toUpperCase();
 });
 
-// ALERT CLEAN
+// ALERT
 function showAlert(title, msg, type = "success") {
 
   const container = document.getElementById("alert-container");
@@ -336,13 +338,10 @@ function showAlert(title, msg, type = "success") {
 
   container.appendChild(alert);
 
-  // anima entrada
   setTimeout(() => alert.classList.add("show"), 10);
 
-  // fechar manual
   alert.querySelector(".alert-close").onclick = () => removeAlert(alert);
 
-  // auto remover
   setTimeout(() => removeAlert(alert), 3000);
 }
 
@@ -354,16 +353,10 @@ function removeAlert(alert) {
     alert.remove();
   }, 250);
 }
-  el.querySelector(".alert-close").onclick = () => fechar();
 
-  function fechar(){
-    el.classList.remove("show");
-    el.classList.add("hide");
-    setTimeout(() => el.remove(), 250);
-  }
+// 🔥 INPUT EMAIL SCROLL
+const emailInput = document.getElementById("loginEmail");
 
-  setTimeout(fechar, 2500);
-
-
-// INIT
-carregarDados();
+emailInput.addEventListener("input", () => {
+  emailInput.scrollLeft = emailInput.scrollWidth;
+});
