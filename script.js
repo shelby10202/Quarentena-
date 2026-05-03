@@ -15,7 +15,8 @@ import {
   getAuth, 
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
-  onAuthStateChanged
+  onAuthStateChanged,
+  signOut
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 // 🔥 CONFIG FIREBASE
@@ -32,6 +33,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
+signOut(auth);
 const form = document.getElementById("loginForm");
 const signupBtn = document.getElementById("signupBtn");
 form.addEventListener("submit", async (e) => {
@@ -42,10 +44,8 @@ form.addEventListener("submit", async (e) => {
 
   try {
     await signInWithEmailAndPassword(auth, email, senha);
-    console.log("Logado com sucesso");
   } catch (err) {
-    console.error(err);
-    alert("Erro no login");
+    alert("Email ou senha inválidos");
   }
 });
 signupBtn.onclick = async () => {
@@ -65,13 +65,12 @@ onAuthStateChanged(auth, (user) => {
 
   if (user) {
     document.getElementById("login-screen").style.display = "none";
-    carregarDados(); // sua função já existente
+    carregarDados();
   } else {
     document.getElementById("login-screen").style.display = "flex";
   }
 
 });
-
 // VARIÁVEIS
 let data = [];
 let chart;
