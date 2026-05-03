@@ -63,35 +63,46 @@ signupBtn.onclick = async () => {
 };
 onAuthStateChanged(auth, async (user) => {
 
-  const loginScreen = document.getElementById("login-screen");
-  const loaderScreen = document.getElementById("loader-screen");
+  const login = document.getElementById("login-screen");
+  const loader = document.getElementById("loader-screen");
 
   if (user) {
 
-    loginScreen.style.display = "none";
-    loaderScreen.style.display = "flex";
+    // 🔽 fade out login
+    login.classList.add("hidden");
 
-    const inicio = Date.now();
+    setTimeout(async () => {
 
-    // 🔄 carrega dados
-    await carregarDados();
+      login.style.display = "none";
 
-    const tempoDecorrido = Date.now() - inicio;
+      // 🔼 fade in loader
+      loader.style.display = "flex";
+      loader.classList.remove("hidden");
 
-    // ⏳ garante pelo menos 2 segundos
-    const tempoMinimo = 2000;
+      const inicio = Date.now();
 
-    if (tempoDecorrido < tempoMinimo) {
-      await new Promise(resolve => 
-        setTimeout(resolve, tempoMinimo - tempoDecorrido)
-      );
-    }
+      await carregarDados();
 
-    loaderScreen.style.display = "none";
+      const tempo = Date.now() - inicio;
+      const minimo = 2000;
+
+      if (tempo < minimo) {
+        await new Promise(r => setTimeout(r, minimo - tempo));
+      }
+
+      // 🔽 fade out loader
+      loader.classList.add("hidden");
+
+      setTimeout(() => {
+        loader.style.display = "none";
+      }, 400);
+
+    }, 400);
 
   } else {
-    loginScreen.style.display = "flex";
-    loaderScreen.style.display = "none";
+    login.style.display = "flex";
+    login.classList.remove("hidden");
+    loader.style.display = "none";
   }
 
 });
