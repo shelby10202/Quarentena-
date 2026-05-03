@@ -61,13 +61,37 @@ signupBtn.onclick = async () => {
     alert("Erro ao criar usuário");
   }
 };
-onAuthStateChanged(auth, (user) => {
+onAuthStateChanged(auth, async (user) => {
+
+  const loginScreen = document.getElementById("login-screen");
+  const loaderScreen = document.getElementById("loader-screen");
 
   if (user) {
-    document.getElementById("login-screen").style.display = "none";
-    carregarDados();
+
+    loginScreen.style.display = "none";
+    loaderScreen.style.display = "flex";
+
+    const inicio = Date.now();
+
+    // 🔄 carrega dados
+    await carregarDados();
+
+    const tempoDecorrido = Date.now() - inicio;
+
+    // ⏳ garante pelo menos 2 segundos
+    const tempoMinimo = 2000;
+
+    if (tempoDecorrido < tempoMinimo) {
+      await new Promise(resolve => 
+        setTimeout(resolve, tempoMinimo - tempoDecorrido)
+      );
+    }
+
+    loaderScreen.style.display = "none";
+
   } else {
-    document.getElementById("login-screen").style.display = "flex";
+    loginScreen.style.display = "flex";
+    loaderScreen.style.display = "none";
   }
 
 });
