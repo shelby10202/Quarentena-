@@ -272,7 +272,15 @@ function removeAlert(alert) {
     alert.remove();
   }, 250);
 }
+  el.querySelector(".alert-close").onclick = () => fechar();
 
+  function fechar(){
+    el.classList.remove("show");
+    el.classList.add("hide");
+    setTimeout(() => el.remove(), 250);
+  }
+
+  setTimeout(fechar, 2500);
 
 
 // INIT
