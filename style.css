@@ -87,9 +87,14 @@ table {
   width:90%;
   margin:30px auto;
   background:white;
-  border-radius:10px;
-  overflow:hidden;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08); /* 🔥 leve profundidade */
+
+  border-radius: 0;          /* ❌ remove arredondamento geral */
+  overflow: visible;         /* ❌ não corta */
+
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+
+  border-collapse: separate; /* 🔥 essencial */
+  border-spacing: 0;
 }
 
 th, td {
@@ -102,15 +107,49 @@ thead tr:last-child th {
   color:#fff;
 }
 
+/* 🔥 AQUI ESTÁ O QUE VOCÊ QUER */
+thead tr:last-child th:first-child {
+  border-top-left-radius: 10px;
+}
+
+thead tr:last-child th:last-child {
+  border-top-right-radius: 10px;
+}
+
+
 /* INPUT */
 .input-row td { background:#f9fafb; }
 
 .input-custom {
-  background:#1c1c1e;
-  color:#e5e5e5;
-  border:none;
-  padding:6px;
-  border-radius:6px;
+  --radius: 0.6em;
+
+  background: #e8e8e8;
+  border: 2px solid #000;
+  border-radius: var(--radius);
+
+  padding: 0.6em 0.8em;
+  font-size: 14px;
+  font-weight: 500;
+
+  color: #000;
+  outline: none;
+
+  transform: translateY(-0.15em);
+  transition: all 0.1s ease;
+}
+
+/* efeito igual botão */
+.input-custom:focus {
+  transform: translateY(0);
+  background: #fff;
+}
+
+/* select igual input */
+select.input-custom {
+  cursor: pointer;
+}
+.input-row td {
+  background: transparent;
 }
 
 /* TAGS */
@@ -239,4 +278,134 @@ thead tr:last-child th {
   #graficoPizza {
     height:300px !important;
   }
+  #loader-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+
+  opacity: 1;
+  visibility: visible;
+
+  transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+/* estado escondido */
+#loader-container.hide {
+  opacity: 0;
+  visibility: hidden;
+}
+
+}
+#alert-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.alert-clean {
+  background: rgba(20, 20, 20, 0.85);
+  color: #fff;
+  padding: 12px 14px;
+  border-radius: 10px;
+  min-width: 220px;
+
+  font-size: 13px;
+  backdrop-filter: blur(8px);
+
+  box-shadow: 0 10px 25px rgba(252, 251, 251, 0.25);
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  opacity: 0;
+  transform: translateY(20px) scale(0.98);
+}
+
+.alert-clean.show {
+  animation: alertIn 0.35s forwards;
+}
+
+.alert-clean.hide {
+  animation: alertOut 0.25s forwards;
+}
+
+@keyframes alertIn {
+  from { opacity:0; transform:translateY(20px); }
+  to { opacity:1; transform:translateY(0); }
+}
+
+@keyframes alertOut {
+  from { opacity:1; }
+  to { opacity:0; transform:translateY(15px); }
+}
+
+.alert-clean.success { border-left: 3px solid #00c853; }
+.alert-clean.error { border-left: 3px solid #ff4d4f; }
+
+.alert-close {
+  cursor: pointer;
+  margin-left: 10px;
+}
+.card-title {
+  font-size: 14px;
+  opacity: 0.9;
+  margin-bottom: 8px;
+}
+
+.card span {
+  font-size: 28px;
+  font-weight: bold;
+}
+/* BOTÃO MODERNO */
+#addBtn {
+  --button_radius: 0.75em;
+  --button_color: #e8e8e8;
+  --button_outline_color: #000000;
+
+  font-size: 14px;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  border-radius: var(--button_radius);
+  background: var(--button_outline_color);
+}
+
+/* Estado desabilitado */
+#addBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+#addBtn .button_top {
+  display: block;
+  box-sizing: border-box;
+  border: 2px solid var(--button_outline_color);
+  border-radius: var(--button_radius);
+  padding: 0.6em 1.2em;
+  background: var(--button_color);
+  color: var(--button_outline_color);
+  transform: translateY(-0.2em);
+  transition: transform 0.1s ease;
+}
+
+/* Hover só quando NÃO estiver desabilitado */
+#addBtn:not(:disabled):hover .button_top {
+  transform: translateY(-0.33em);
+}
+
+/* Click */
+#addBtn:not(:disabled):active .button_top {
+  transform: translateY(0);
 }

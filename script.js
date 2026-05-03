@@ -6,10 +6,11 @@ import {
   addDoc, 
   getDocs, 
   deleteDoc, 
-  doc 
+  doc,
+  updateDoc
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-// 🔥 SUA CONFIG (já coloquei)
+// 🔥 CONFIG FIREBASE
 const firebaseConfig = {
   apiKey: "AIzaSyAZ6gOO32DstTL9LPSgtYYa3Jptq_8QNrs",
   authDomain: "quarentena-39458.firebaseapp.com",
@@ -45,23 +46,17 @@ const count_scrap = document.getElementById("count_scrap");
 const count_entregue = document.getElementById("count_entregue");
 const count_outros = document.getElementById("count_outros");
 
-// ABAS GLOBAL
-window.showTab = function(tab){
-  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
-  document.getElementById(tab).classList.add("active");
-
-  if(tab==="dashboard"){
-    setTimeout(()=>gerarGrafico(),100);
-  }
-};
+// REGEX (UMA VEZ SÓ)
+const regexPrefixo = /^(PR|PS|PT)-[A-Z]{3}$|^(EB|FAB)-\d{4}$/;
+const regexProtocolo = /^HBRQ-\d{3}$/;
 
 // 🔥 CARREGAR DADOS
 async function carregarDados(){
   const querySnapshot = await getDocs(collection(db, "pecas"));
 
-  data = querySnapshot.docs.map(doc => ({
-    id: doc.id,
-    ...doc.data()
+  data = querySnapshot.docs.map(docSnap => ({
+    id: docSnap.id,
+    ...docSnap.data()
   }));
 
   renderTable();
@@ -69,16 +64,70 @@ async function carregarDados(){
 }
 
 // ADD
-addBtn.onclick = async ()=>{
+addBtn.onclick = async () => {
+
+  const prefixo = newPrefixo.value.trim().toUpperCase();
+  const protocolo = newProtocolo.value.trim().toUpperCase();
+
+  if (!prefixo || !protocolo || !newSetor.value || !newEngenharia.value || !newStatus.value){
+    showAlert("Erro", "Preencha todos os campos", "error");
+    return;
+  }
+
+  if (!regexPrefixo.test(prefixo)){
+    showAlert("Erro", "Prefixo inválido", "error");
+    return;
+  }
+
+  if (!regexProtocolo.test(protocolo)){
+    showAlert("Erro", "Protocolo inválido", "error");
+    return;
+  }
+
   await addDoc(collection(db, "pecas"), {
-    prefixo:newPrefixo.value,
-    protocolo:newProtocolo.value,
-    setor:newSetor.value,
-    engenharia:newEngenharia.value,
-    status:newStatus.value,
-    data:new Date().toLocaleDateString('pt-BR')
+    prefixo,
+    protocolo,
+    setor: newSetor.value,
+    engenharia: newEngenharia.value,
+    status: newStatus.value,
+    data: new Date().toLocaleDateString('pt-BR')
   });
 
+  showAlert("Sucesso", "Aeronave adicionada!");
+
+  newPrefixo.value = "";
+  newProtocolo.value = "";
+  newSetor.value = "";
+  newEngenharia.value = "";
+  newStatus.value = "";
+
+  carregarDados();
+};
+
+// EDITAR
+window.editarItem = async function(id){
+
+  const item = data.find(d => d.id === id);
+  if(!item) return;
+
+  const novoPrefixo = prompt("Editar Prefixo:", item.prefixo);
+  if(!novoPrefixo) return;
+
+  const novoStatus = prompt("Editar Status:", item.status);
+  if(!novoStatus) return;
+
+  await updateDoc(doc(db, "pecas", id), {
+    prefixo: novoPrefixo,
+    status: novoStatus
+  });
+
+  showAlert("Sucesso", "Aeronave atualizada");
+  carregarDados();
+};
+
+// DELETE
+window.deleteItem = async function(id){
+  await deleteDoc(doc(db, "pecas", id));
   carregarDados();
 };
 
@@ -95,17 +144,14 @@ function renderTable(){
         <td>${item.engenharia}</td>
         <td>${item.status}</td>
         <td>${item.data}</td>
-        <td><button onclick="deleteItem('${item.id}')">X</button></td>
+        <td>
+          <button onclick="editarItem('${item.id}')">✏️</button>
+          <button onclick="deleteItem('${item.id}')">🗑️</button>
+        </td>
       </tr>
     `;
   });
 }
-
-// DELETE GLOBAL
-window.deleteItem = async function(id){
-  await deleteDoc(doc(db, "pecas", id));
-  carregarDados();
-};
 
 // DASHBOARD
 function updateDashboard(){
@@ -130,9 +176,7 @@ function gerarGrafico(){
         borderColor:"#00c853"
       }]
     },
-    options:{
-      maintainAspectRatio:false
-    }
+    options:{ maintainAspectRatio:false }
   });
 
   const statusCount = {};
@@ -151,11 +195,93 @@ function gerarGrafico(){
         backgroundColor:["green","red","orange","#007aff","#555"]
       }]
     },
-    options:{
-      maintainAspectRatio:false
-    }
+    options:{ maintainAspectRatio:false }
   });
 }
+
+// LOADER + ABAS
+window.showTab = function(tab){
+
+  document.querySelectorAll(".tab")
+    .forEach(t => t.classList.remove("active"));
+
+  document.getElementById(tab)
+    .classList.add("active");
+
+  if(tab === "dashboard"){
+    gerarGrafico();
+  }
+};
+
+// VALIDAÇÃO BOTÃO
+function validarCampos(){
+  addBtn.disabled = !(
+    newPrefixo.value.trim() &&
+    newProtocolo.value.trim() &&
+    newSetor.value &&
+    newEngenharia.value &&
+    newStatus.value
+  );
+}
+
+[newPrefixo, newProtocolo, newSetor, newEngenharia, newStatus]
+.forEach(input => input.addEventListener("input", validarCampos));
+
+// UPPERCASE
+newPrefixo.addEventListener("input", () => {
+  newPrefixo.value = newPrefixo.value.toUpperCase();
+});
+
+newProtocolo.addEventListener("input", () => {
+  newProtocolo.value = newProtocolo.value.toUpperCase();
+});
+
+// ALERT CLEAN
+function showAlert(title, msg, type = "success") {
+
+  const container = document.getElementById("alert-container");
+
+  const alert = document.createElement("div");
+  alert.className = `alert-clean ${type}`;
+
+  alert.innerHTML = `
+    <div>
+      <div style="font-weight:600">${title}</div>
+      <div style="font-size:11px;color:#aaa">${msg}</div>
+    </div>
+    <span class="alert-close">✕</span>
+  `;
+
+  container.appendChild(alert);
+
+  // anima entrada
+  setTimeout(() => alert.classList.add("show"), 10);
+
+  // fechar manual
+  alert.querySelector(".alert-close").onclick = () => removeAlert(alert);
+
+  // auto remover
+  setTimeout(() => removeAlert(alert), 3000);
+}
+
+function removeAlert(alert) {
+  alert.classList.remove("show");
+  alert.classList.add("hide");
+
+  setTimeout(() => {
+    alert.remove();
+  }, 250);
+}
+  el.querySelector(".alert-close").onclick = () => fechar();
+
+  function fechar(){
+    el.classList.remove("show");
+    el.classList.add("hide");
+    setTimeout(() => el.remove(), 250);
+  }
+
+  setTimeout(fechar, 2500);
+
 
 // INIT
 carregarDados();
