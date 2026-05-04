@@ -286,13 +286,13 @@ function renderTable(){
   data.forEach(item=>{
     table_body.innerHTML += `
       <tr>
-        <td>${item.prefixo}</td>
-        <td>${item.protocolo}</td>
-        <td>${item.setor}</td>
-        <td>${item.engenharia}</td>
-        <td>${item.status}</td>
-        <td>${item.data}</td>
-        <td>
+        <td data-label="Prefixo">${item.prefixo}</td>
+        <td data-label="Protocolo">${item.protocolo}</td>
+        <td data-label="Setor">${item.setor}</td>
+        <td data-label="Engenharia">${item.engenharia}</td>
+        <td data-label="Status">${item.status}</td>
+        <td data-label="Data">${item.data}</td>
+        <td data-label="Ações">
           <button onclick="editarItem('${item.id}')">✏️</button>
           <button onclick="deleteItem('${item.id}')">🗑️</button>
         </td>

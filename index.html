@@ -12,28 +12,20 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
-<div id="alert-container"></div>
-
 <body>
 
-<div id="login-screen">
+<div id="alert-container"></div>
 
+<!-- LOGIN -->
+<div id="login-screen">
   <form class="form" id="loginForm">
     <p id="heading">Login</p>
 
     <div class="field">
-      <svg class="input-icon" viewBox="0 0 16 16">
-        <path d="M13.106 7.222"></path>
-      </svg>
-
       <input id="loginEmail" class="input-field" type="email" placeholder="Email">
     </div>
 
     <div class="field">
-      <svg class="input-icon" viewBox="0 0 16 16">
-        <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2z"></path>
-      </svg>
-
       <input id="loginSenha" class="input-field" type="password" placeholder="Senha">
     </div>
 
@@ -42,14 +34,14 @@
       <button type="button" class="button2" id="signupBtn">Criar</button>
     </div>
   </form>
-
 </div>
+
 <div id="loader-screen" style="display: none;">
   <div class="loader"></div>
 </div>
 
+<!-- TOPBAR -->
 <header class="topbar">
-
   <div class="logo">Controle Descarte e Entrega</div>
 
   <nav class="menu">
@@ -61,9 +53,9 @@
   <div class="user-area">
     <span id="userEmail">...</span>
   </div>
-
 </header>
 
+<!-- TABELA -->
 <section id="tabela" class="tab active">
 <table>
 <thead>
@@ -99,9 +91,11 @@
 </select>
 </td>
 
-<td><button id="addBtn" disabled>
-  <span class="button_top">Adicionar</span>
-</button></td>
+<td>
+<button id="addBtn" disabled>
+<span class="button_top">Adicionar</span>
+</button>
+</td>
 <td></td>
 </tr>
 
@@ -121,72 +115,64 @@
 </table>
 </section>
 
+<!-- DASHBOARD -->
 <section id="dashboard" class="tab">
-
 <div class="dashboard-container">
 
 <div class="cards">
+<div class="card espera">
+<div class="card-title">Em Engenharia</div>
+<span id="count_espera">0</span>
+</div>
 
-  <div class="card espera">
-    <div class="card-title">Em Engenharia (Espera)</div>
-    <span id="count_espera">0</span>
-  </div>
+<div class="card scrap">
+<div class="card-title">Scrap</div>
+<span id="count_scrap">0</span>
+</div>
 
-  <div class="card scrap">
-    <div class="card-title">Scrap</div>
-    <span id="count_scrap">0</span>
-  </div>
+<div class="card entregue">
+<div class="card-title">Entregues</div>
+<span id="count_entregue">0</span>
+</div>
 
-  <div class="card entregue">
-    <div class="card-title">Entregues</div>
-    <span id="count_entregue">0</span>
-  </div>
-
-  <div class="card outros">
-    <div class="card-title">Outros</div>
-    <span id="count_outros">0</span>
-  </div>
+<div class="card outros">
+<div class="card-title">Total</div>
+<span id="count_outros">0</span>
+</div>
 </div>
 
 <div class="graficos-container">
-  <div class="grafico-box">
-    <h3>Evolução</h3>
-    <canvas id="grafico"></canvas>
-  </div>
+<div class="grafico-box">
+<h3>Evolução</h3>
+<canvas id="grafico"></canvas>
+</div>
 
-  <div class="grafico-box">
-    <h3>Status</h3>
-    <canvas id="graficoPizza"></canvas>
-  </div>
+<div class="grafico-box">
+<h3>Status</h3>
+<canvas id="graficoPizza"></canvas>
+</div>
 </div>
 
 </div>
-
 </section>
 
-</section> <!-- fecha dashboard -->
-
-<!-- 🔥 HISTÓRICO -->
+<!-- HISTÓRICO -->
 <section id="historico" class="tab">
+<div class="dashboard-container">
 
-  <div class="dashboard-container">
+<h3>Histórico</h3>
 
-    <h3>Histórico</h3>
+<div class="historico-filtros">
+<input id="filtroPrefixo" class="input-custom" placeholder="Prefixo">
+<input id="filtroUsuario" class="input-custom" placeholder="Usuário">
+</div>
 
-    <div style="display:flex; gap:10px; margin-bottom:15px;">
-      <input id="filtroPrefixo" placeholder="Filtrar prefixo" class="input-custom">
-      <input id="filtroUsuario" placeholder="Filtrar usuário" class="input-custom">
-    </div>
+<div id="timeline"></div>
 
-    <div id="timeline"></div>
-
-  </div>
-
+</div>
 </section>
 
-<!-- 🔥 SCRIPT -->
 <script type="module" src="script.js"></script>
-
 
 </body>
 </html>
