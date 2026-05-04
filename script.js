@@ -1,4 +1,4 @@
-// 🔥 IMPORTS FIREBASE (MODULAR)
+// 🔥 IMPORTS FIREBASE
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 
 import { 
@@ -18,7 +18,7 @@ import {
   onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-// 🔥 CONFIG FIREBASE
+// 🔥 CONFIG
 const firebaseConfig = {
   apiKey: "AIzaSyAZ6gOO32DstTL9LPSgtYYa3Jptq_8QNrs",
   authDomain: "quarentena-39458.firebaseapp.com",
@@ -28,209 +28,271 @@ const firebaseConfig = {
   appId: "1:200343768046:web:86905492b62c2fa7049cff"
 };
 
-// INIT
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-// ELEMENTOS LOGIN
+// ================= ELEMENTOS =================
+const loginEmail = document.getElementById("loginEmail");
+const loginSenha = document.getElementById("loginSenha");
 const form = document.getElementById("loginForm");
 const signupBtn = document.getElementById("signupBtn");
 
-// LOGIN
-form.addEventListener("submit", async (e) => {
-  e.preventDefault();
-
-  const email = document.getElementById("loginEmail").value;
-  const senha = document.getElementById("loginSenha").value;
-
-  try {
-    await signInWithEmailAndPassword(auth, email, senha);
-  } catch (err) {
-    alert("Email ou senha inválidos");
-  }
-});
-
-// CRIAR USUÁRIO
-signupBtn.onclick = async () => {
-  const email = document.getElementById("loginEmail").value;
-  const senha = document.getElementById("loginSenha").value;
-
-  try {
-    await createUserWithEmailAndPassword(auth, email, senha);
-    alert("Usuário criado!");
-  } catch (err) {
-    console.error(err);
-    alert("Erro ao criar usuário");
-  }
-};
-
-// 🔄 CONTROLE DE LOGIN + LOADER
-onAuthStateChanged(auth, async (user) => {
-
-  const login = document.getElementById("login-screen");
-  const loader = document.getElementById("loader-screen");
-
-  if (user) {
-
-    login.classList.add("fade-out");
-
-    setTimeout(async () => {
-
-      login.style.display = "none";
-
-      loader.style.display = "flex";
-
-      const inicio = Date.now();
-
-      await carregarDados();
-
-      const tempo = Date.now() - inicio;
-      const minimo = 1500;
-
-      if (tempo < minimo) {
-        await new Promise(r => setTimeout(r, minimo - tempo));
-      }
-
-      loader.classList.add("fade-out");
-
-      setTimeout(() => {
-        loader.style.display = "none";
-      }, 400);
-
-    }, 300);
-
-  } else {
-    login.style.display = "flex";
-    loader.style.display = "none";
-  }
-
-});
-
-// ==============================
-// 🔥 APP PRINCIPAL
-// ==============================
-
-let data = [];
-let chart;
-let chartPizza;
-
-// ELEMENTOS
 const table_body = document.getElementById("table_body");
 const addBtn = document.getElementById("addBtn");
 
-// INPUTS
 const newPrefixo = document.getElementById("newPrefixo");
 const newProtocolo = document.getElementById("newProtocolo");
 const newSetor = document.getElementById("newSetor");
 const newEngenharia = document.getElementById("newEngenharia");
 const newStatus = document.getElementById("newStatus");
 
-// DASHBOARD
 const count_espera = document.getElementById("count_espera");
 const count_scrap = document.getElementById("count_scrap");
 const count_entregue = document.getElementById("count_entregue");
 const count_outros = document.getElementById("count_outros");
 
-// REGEX
-const regexPrefixo = /^(PR|PS|PT)-[A-Z]{3}$|^(EB|FAB)-\d{4}$/;
-const regexProtocolo = /^HBRQ-\d{3}$/;
+const userEmail = document.getElementById("userEmail");
 
-// 🔥 CARREGAR DADOS
+let chart;
+let chartPizza;
+
+// ================= DADOS =================
+let data = [];
+let historicoGlobal = [];
+
+// ================= LOGIN =================
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  try {
+    await signInWithEmailAndPassword(
+      auth,
+      loginEmail.value,
+      loginSenha.value
+    );
+
+  } catch (e) {
+    console.error("ERRO LOGIN:", e);
+
+    alert(e.message); // 🔥 MOSTRA O ERRO REAL
+  }
+});
+
+signupBtn.onclick = async () => {
+  try {
+    await createUserWithEmailAndPassword(auth, loginEmail.value, loginSenha.value);
+    alert("Usuário criado!");
+  } catch (e) {
+    alert(e.message);
+  }
+};
+
+// ================= AUTH =================
+onAuthStateChanged(auth, async (user) => {
+
+  const login = document.getElementById("login-screen");
+  const loader = document.getElementById("loader-screen");
+
+  if (user) {
+    login.style.display = "none";
+    loader.style.display = "flex";
+
+    if (userEmail) userEmail.textContent = user.email;
+
+    await carregarDados();
+
+    loader.style.display = "none";
+  } else {
+    login.style.display = "flex";
+    loader.style.display = "none";
+
+    if (userEmail) userEmail.textContent = "";
+  }
+});
+
+// ================= CARREGAR =================
 async function carregarDados(){
-  const querySnapshot = await getDocs(collection(db, "pecas"));
+  try {
+    const snap = await getDocs(collection(db, "pecas"));
 
-  data = querySnapshot.docs.map(docSnap => ({
-    id: docSnap.id,
-    ...docSnap.data()
-  }));
+    data = snap.docs.map(d => ({
+      id: d.id,
+      ...d.data()
+    }));
 
-  renderTable();
-  updateDashboard();
+    await carregarHistorico();
+
+    renderTable();
+    updateDashboard();
+
+  } catch (e) {
+    console.error(e);
+    alert("Erro ao carregar dados");
+  }
 }
 
-// ADD
+// ================= HISTÓRICO =================
+async function carregarHistorico(){
+  try {
+    const snap = await getDocs(collection(db, "historico"));
+    historicoGlobal = snap.docs.map(d => d.data());
+  } catch (e) {
+    console.warn("Erro histórico:", e);
+    historicoGlobal = [];
+  }
+}
+
+function renderHistorico(){
+
+  const timeline = document.getElementById("timeline");
+  if (!timeline) return;
+
+  const filtroPrefixo = (document.getElementById("filtroPrefixo")?.value || "").toLowerCase();
+  const filtroUsuario = (document.getElementById("filtroUsuario")?.value || "").toLowerCase();
+
+  timeline.innerHTML = "";
+
+  historicoGlobal
+    .filter(h => {
+      const prefixo = (h.prefixo || "").toLowerCase();
+      const usuario = (h.usuario || "").toLowerCase();
+
+      return (
+        (!filtroPrefixo || prefixo.includes(filtroPrefixo)) &&
+        (!filtroUsuario || usuario.includes(filtroUsuario))
+      );
+    })
+    .sort((a,b)=> new Date(b.data) - new Date(a.data))
+    .forEach(h => {
+
+      timeline.innerHTML += `
+  <div class="timeline-item">
+
+    <div class="timeline-dot"></div>
+
+    <div class="timeline-content">
+
+      <div class="timeline-title">
+        <span>${h.prefixo}</span>
+        <span class="timeline-arrow">→</span>
+        <span class="badge">${h.acao}</span>
+      </div>
+
+      <div class="timeline-meta">
+        ${h.data} • ${h.usuario}
+      </div>
+
+    </div>
+  </div>
+`;
+    });
+}
+
+// 🔥 filtros funcionando
+document.getElementById("filtroPrefixo")?.addEventListener("input", renderHistorico);
+document.getElementById("filtroUsuario")?.addEventListener("input", renderHistorico);
+
+// ================= ADD =================
 addBtn.onclick = async () => {
+  try {
 
-  const prefixo = newPrefixo.value.trim().toUpperCase();
-  const protocolo = newProtocolo.value.trim().toUpperCase();
+    if (!newPrefixo.value || !newProtocolo.value || !newSetor.value || !newEngenharia.value || !newStatus.value){
+      alert("Preencha tudo");
+      return;
+    }
 
-  if (!prefixo || !protocolo || !newSetor.value || !newEngenharia.value || !newStatus.value){
-    showAlert("Erro", "Preencha todos os campos", "error");
-    return;
+    const docRef = await addDoc(collection(db, "pecas"), {
+      prefixo: newPrefixo.value.toUpperCase(),
+      protocolo: newProtocolo.value.toUpperCase(),
+      setor: newSetor.value,
+      engenharia: newEngenharia.value,
+      status: newStatus.value,
+      data: new Date().toLocaleDateString('pt-BR')
+    });
+
+    await addDoc(collection(db, "historico"), {
+      pecaId: docRef.id,
+      prefixo: newPrefixo.value.toUpperCase(),
+      acao: "criado",
+      usuario: auth.currentUser?.email || "desconhecido",
+      data: new Date().toLocaleString("pt-BR")
+    });
+
+    limparCampos();
+    validarCampos();
+    carregarDados();
+
+  } catch (e) {
+    console.error("Erro ao adicionar:", e);
+    alert("Erro ao adicionar");
   }
-
-  if (!regexPrefixo.test(prefixo)){
-    showAlert("Erro", "Prefixo inválido", "error");
-    return;
-  }
-
-  if (!regexProtocolo.test(protocolo)){
-    showAlert("Erro", "Protocolo inválido", "error");
-    return;
-  }
-
-  await addDoc(collection(db, "pecas"), {
-    prefixo,
-    protocolo,
-    setor: newSetor.value,
-    engenharia: newEngenharia.value,
-    status: newStatus.value,
-    data: new Date().toLocaleDateString('pt-BR')
-  });
-
-  showAlert("Sucesso", "Aeronave adicionada!");
-
-  newPrefixo.value = "";
-  newProtocolo.value = "";
-  newSetor.value = "";
-  newEngenharia.value = "";
-  newStatus.value = "";
-
-  carregarDados();
 };
 
-// EDITAR
+// ================= EDIT =================
 window.editarItem = async function(id){
+  try {
+    const item = data.find(d => d.id === id);
+    if(!item) return;
 
-  const item = data.find(d => d.id === id);
-  if(!item) return;
+    const novoStatus = prompt("Novo status:", item.status);
+    if(!novoStatus) return;
 
-  const novoPrefixo = prompt("Editar Prefixo:", item.prefixo);
-  if(!novoPrefixo) return;
+    await updateDoc(doc(db, "pecas", id), { status: novoStatus });
 
-  const novoStatus = prompt("Editar Status:", item.status);
-  if(!novoStatus) return;
+    await addDoc(collection(db, "historico"), {
+      pecaId: id,
+      prefixo: item.prefixo,
+      acao: "editado",
+      usuario: auth.currentUser?.email || "desconhecido",
+      data: new Date().toLocaleString("pt-BR")
+    });
 
-  await updateDoc(doc(db, "pecas", id), {
-    prefixo: novoPrefixo,
-    status: novoStatus
-  });
+    carregarDados();
 
-  showAlert("Sucesso", "Atualizado!");
-  carregarDados();
+  } catch (e) {
+    console.error(e);
+    alert("Erro ao editar");
+  }
 };
 
-// DELETE
+// ================= DELETE =================
 window.deleteItem = async function(id){
-  await deleteDoc(doc(db, "pecas", id));
-  carregarDados();
+  try {
+    const item = data.find(d => d.id === id);
+
+    await deleteDoc(doc(db, "pecas", id));
+
+    await addDoc(collection(db, "historico"), {
+      pecaId: id,
+      prefixo: item?.prefixo || "",
+      acao: "excluido",
+      usuario: auth.currentUser?.email || "desconhecido",
+      data: new Date().toLocaleString("pt-BR")
+    });
+
+    carregarDados();
+
+  } catch (e) {
+    console.error(e);
+    alert("Erro ao excluir");
+  }
 };
 
-// TABLE
+// ================= TABLE =================
 function renderTable(){
-  table_body.innerHTML="";
+  table_body.innerHTML = "";
 
   data.forEach(item=>{
-    table_body.innerHTML+=`
+    table_body.innerHTML += `
       <tr>
-        <td data-label="Prefixo">${item.prefixo}</td>
-        <td data-label="Protocolo">${item.protocolo}</td>
-        <td data-label="Setor">${item.setor}</td>
-        <td data-label="Engenharia">${item.engenharia}</td>
-        <td data-label="Status">${item.status}</td>
-        <td data-label="Data">${item.data}</td>
-        <td data-label="Ações">
+        <td>${item.prefixo}</td>
+        <td>${item.protocolo}</td>
+        <td>${item.setor}</td>
+        <td>${item.engenharia}</td>
+        <td>${item.status}</td>
+        <td>${item.data}</td>
+        <td>
           <button onclick="editarItem('${item.id}')">✏️</button>
           <button onclick="deleteItem('${item.id}')">🗑️</button>
         </td>
@@ -239,15 +301,15 @@ function renderTable(){
   });
 }
 
-// DASHBOARD
+// ================= DASHBOARD =================
 function updateDashboard(){
   count_espera.innerText = data.filter(d=>d.engenharia==="espera").length;
-  count_scrap.innerText = data.filter(d=>d.status==="scrap").length;
+  count_scrap.innerText = data.filter(d=>d.status==="Descaracterização").length;
   count_entregue.innerText = data.filter(d=>d.status==="entregue").length;
-  count_outros.innerText = data.filter(d=>!["scrap","entregue"].includes(d.status)).length;
+  count_outros.innerText = data.length;
 }
 
-// GRÁFICOS
+// ================= GRÁFICOS =================
 function gerarGrafico(){
 
   if(chart) chart.destroy();
@@ -257,9 +319,7 @@ function gerarGrafico(){
     type:"line",
     data:{
       labels:["Jan","Fev","Mar"],
-      datasets:[{
-        data:[2,4,6]
-      }]
+      datasets:[{ data:[2,4,6] }]
     },
     options:{ maintainAspectRatio:false }
   });
@@ -275,29 +335,25 @@ function gerarGrafico(){
     type:"pie",
     data:{
       labels:Object.keys(statusCount),
-      datasets:[{
-        data:Object.values(statusCount)
-      }]
+      datasets:[{ data:Object.values(statusCount) }]
     },
     options:{ maintainAspectRatio:false }
   });
 }
 
-// ABAS
+// ================= ABAS =================
 window.showTab = function(tab){
 
   document.querySelectorAll(".tab")
     .forEach(t => t.classList.remove("active"));
 
-  document.getElementById(tab)
-    .classList.add("active");
+  document.getElementById(tab).classList.add("active");
 
-  if(tab === "dashboard"){
-    gerarGrafico();
-  }
+  if(tab === "dashboard") gerarGrafico();
+  if(tab === "historico") renderHistorico();
 };
 
-// VALIDAÇÃO
+// ================= VALIDAÇÃO =================
 function validarCampos(){
   addBtn.disabled = !(
     newPrefixo.value.trim() &&
@@ -311,52 +367,11 @@ function validarCampos(){
 [newPrefixo, newProtocolo, newSetor, newEngenharia, newStatus]
 .forEach(input => input.addEventListener("input", validarCampos));
 
-// UPPERCASE
-newPrefixo.addEventListener("input", () => {
-  newPrefixo.value = newPrefixo.value.toUpperCase();
-});
-
-newProtocolo.addEventListener("input", () => {
-  newProtocolo.value = newProtocolo.value.toUpperCase();
-});
-
-// ALERT
-function showAlert(title, msg, type = "success") {
-
-  const container = document.getElementById("alert-container");
-
-  const alert = document.createElement("div");
-  alert.className = `alert-clean ${type}`;
-
-  alert.innerHTML = `
-    <div>
-      <div style="font-weight:600">${title}</div>
-      <div style="font-size:11px;color:#aaa">${msg}</div>
-    </div>
-    <span class="alert-close">✕</span>
-  `;
-
-  container.appendChild(alert);
-
-  setTimeout(() => alert.classList.add("show"), 10);
-
-  alert.querySelector(".alert-close").onclick = () => removeAlert(alert);
-
-  setTimeout(() => removeAlert(alert), 3000);
+// ================= HELPERS =================
+function limparCampos(){
+  newPrefixo.value = "";
+  newProtocolo.value = "";
+  newSetor.value = "";
+  newEngenharia.value = "";
+  newStatus.value = "";
 }
-
-function removeAlert(alert) {
-  alert.classList.remove("show");
-  alert.classList.add("hide");
-
-  setTimeout(() => {
-    alert.remove();
-  }, 250);
-}
-
-// 🔥 INPUT EMAIL SCROLL
-const emailInput = document.getElementById("loginEmail");
-
-emailInput.addEventListener("input", () => {
-  emailInput.scrollLeft = emailInput.scrollWidth;
-});

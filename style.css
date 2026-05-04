@@ -1,7 +1,10 @@
 body {
   font-family: 'Inter', sans-serif;
   margin: 0;
-  background: #e9ecef; /* 🔥 NOVO FUNDO CINZA CLARO */
+  background-color: #ffffff;
+  background-image: radial-gradient(rgba(12, 12, 12, 0.15) 2px, transparent 0);
+  background-size: 30px 30px;
+  background-position: -5px -5px;
 }
 
 /* LOADER */
@@ -536,4 +539,209 @@ select.input-custom {
   flex: 1;
   min-width: 0;
   width: 100%;
+}
+/* TOPBAR XP STYLE */
+/* TOPBAR GRANDE E MODERNA */
+.topbar {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+
+  height:70px;              /* 🔥 aumenta altura */
+  padding:0 30px;          /* 🔥 mais espaço lateral */
+
+  background:#111;
+  color:#fff;
+
+  box-shadow: 0 2px 8px rgba(0,0,0,0.25); /* profundidade */
+}
+
+/* LOGO */
+.topbar .logo {
+  font-size:20px;          /* 🔥 maior */
+  font-weight:600;
+}
+
+/* MENU */
+.topbar .menu a {
+  margin:0 15px;
+  cursor:pointer;
+
+  font-size:15px;          /* 🔥 maior */
+  font-weight:500;
+
+  transition:0.2s;
+}
+
+.topbar .menu a:hover {
+  opacity:0.6;
+}
+
+/* EMAIL USUÁRIO */
+.topbar .user-email {
+  font-size:14px;
+  opacity:0.8;
+}
+/* ================= HISTÓRICO XP ================= */
+
+#timeline {
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+  margin-top:20px;
+  width:100%;
+}
+
+/* ITEM */
+.timeline-item {
+  display:flex;
+  gap:12px;
+  align-items:flex-start;
+}
+
+/* BOLINHA */
+.timeline-dot {
+  width:10px;
+  height:10px;
+  border-radius:50%;
+  background:#ff9800;
+  margin-top:12px;
+  flex-shrink:0;
+}
+
+/* CARD */
+.timeline-content {
+  background:#efefef;
+  padding:14px 18px;
+  border-radius:12px;
+  width:100%;
+
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+/* LINHA PRINCIPAL */
+.timeline-title {
+  display:flex;
+  align-items:center;
+  gap:8px;
+
+  font-size:15px;
+  font-weight:600;
+}
+
+/* SETA */
+.timeline-arrow {
+  opacity:0.6;
+}
+
+/* BADGE (AÇÃO) */
+.badge {
+  background:#ff9800;
+  color:#fff;
+
+  font-size:12px;
+  padding:4px 10px;
+  border-radius:999px;
+
+  font-weight:500;
+}
+
+/* META */
+.timeline-meta {
+  font-size:12px;
+  color:#777;
+}
+.timeline-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.timeline-arrow {
+  opacity: 0.6;
+}
+
+.badge {
+  background: orange;
+  color: white;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+}
+/* CONTAINER DO HISTÓRICO */
+#timeline {
+  width: 90%;
+  max-width: 900px;   /* 🔥 controla largura */
+  margin: 30px auto;  /* 🔥 centraliza */
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* ITEM */
+.timeline-item {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+/* BOLINHA */
+.timeline-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-top: 10px;
+  background: #ff9800;
+}
+
+/* CARD */
+.timeline-content {
+  background: #f1f1f1;
+  padding: 15px 18px;
+  border-radius: 12px;
+  width: 100%;
+
+  /* 🔥 SOMBRA BONITA */
+  box-shadow: 0 15px 40px rgba(0,0,0,0.25);
+
+  transition: 0.2s;
+}
+
+/* HOVER (fica premium) */
+.timeline-content:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 25px rgba(0,0,0,0.18);
+}
+
+/* TÍTULO */
+.timeline-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+}
+
+/* SETA */
+.timeline-arrow {
+  opacity: 0.5;
+}
+
+/* BADGE (status) */
+.badge {
+  background: orange;
+  color: white;
+  padding: 3px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+}
+
+/* META */
+.timeline-meta {
+  font-size: 12px;
+  color: #666;
+  margin-top: 6px;
 }

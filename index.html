@@ -48,14 +48,21 @@
   <div class="loader"></div>
 </div>
 
-<header>
-  <h1>Controle de peças Quarentena</h1>
-</header>
+<header class="topbar">
 
-<nav class="tabs">
-  <button onclick="showTab('tabela')">Tabela</button>
-  <button onclick="showTab('dashboard')">Dashboard</button>
-</nav>
+  <div class="logo">Controle Descarte e Entrega</div>
+
+  <nav class="menu">
+    <a onclick="showTab('tabela')">Tabela</a>
+    <a onclick="showTab('dashboard')">Dashboard</a>
+    <a onclick="showTab('historico')">Histórico</a>
+  </nav>
+
+  <div class="user-area">
+    <span id="userEmail">...</span>
+  </div>
+
+</header>
 
 <section id="tabela" class="tab active">
 <table>
@@ -157,9 +164,28 @@
 
 </section>
 
-<!-- 🔥 SCRIPT PRINCIPAL AGORA É MODULE -->
-<script type="module" src="script.js"></script>
+</section> <!-- fecha dashboard -->
 
+<!-- 🔥 HISTÓRICO -->
+<section id="historico" class="tab">
+
+  <div class="dashboard-container">
+
+    <h3>Histórico</h3>
+
+    <div style="display:flex; gap:10px; margin-bottom:15px;">
+      <input id="filtroPrefixo" placeholder="Filtrar prefixo" class="input-custom">
+      <input id="filtroUsuario" placeholder="Filtrar usuário" class="input-custom">
+    </div>
+
+    <div id="timeline"></div>
+
+  </div>
+
+</section>
+
+<!-- 🔥 SCRIPT -->
+<script type="module" src="script.js"></script>
 
 
 </body>
